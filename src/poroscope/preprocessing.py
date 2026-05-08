@@ -1,0 +1,59 @@
+"""Preprocessing helpers for v0.1 porosity analysis."""
+
+from __future__ import annotations
+
+import numpy as np
+from skimage.color import rgb2gray
+
+from .config import Crop
+
+
+def to_grayscale(image: np.ndarray) -> np.ndarray:
+    """Convert 2D, RGB, or RGBA images to grayscale normalized to 0-255."""
+
+    array = np.asarray(image)
+    if array.ndim == 2:
+        gray = array
+    elif array.ndim == 3 and array.shape[2] in {3, 4}:
+        rgb = array[..., :3]
+        gray = rgb2gray(rgb)
+    else:
+        raise ValueError("Expected a 2D grayscale image or 3D RGB/RGBA image.")
+    return normalize_to_uint8_range(gray)
+
+
+def normalize_to_uint8_range(image: np.ndarray) -> np.ndarray:
+    """Return a floating-point image in the 0-255 intensity range."""
+
+    array = np.asarray(image)
+    if array.dtype == np.bool_:
+        return array.astype(np.float64) * 255.0
+    if np.issubdtype(array.dtype, np.integer):
+        info = np.iinfo(array.dtype)
+        if info.max == info.min:
+            return np.zeros(array.shape, dtype=np.float64)
+        return array.astype(np.float64) / float(info.max) * 255.0
+
+    array = array.astype(np.float64, copy=False)
+    finite = array[np.isfinite(array)]
+    if finite.size == 0:
+        raise ValueError("Image contains no finite intensity values.")
+    min_value = float(finite.min())
+    max_value = float(finite.max())
+    if min_value >= 0.0 and max_value <= 1.0:
+        return np.clip(array, 0.0, 1.0) * 255.0
+    if min_value >= 0.0 and max_value <= 255.0:
+        return np.clip(array, 0.0, 255.0)
+    if max_value == min_value:
+        return np.zeros(array.shape, dtype=np.float64)
+    return (array - min_value) / (max_value - min_value) * 255.0
+
+
+def apply_crop(image: np.ndarray, crop: Crop | None) -> np.ndarray:
+    """Apply an optional x, y, width, height crop."""
+
+    if crop is None:
+        return image
+    crop.validate(image.shape[:2])
+    return image[crop.y : crop.y + crop.height, crop.x : crop.x + crop.width]
+
