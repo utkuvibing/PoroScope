@@ -1,6 +1,6 @@
 """PoroScope: calibrated porosity analysis for microscopy images."""
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 from .config import AnalysisConfig, Crop
 from .pipeline import AnalysisResult, analyze_image

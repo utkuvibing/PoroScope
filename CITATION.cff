@@ -1,11 +1,10 @@
 cff-version: 1.2.0
 message: "If you use PoroScope in academic work, please cite this software."
 title: "PoroScope: calibrated porosity analysis for microscopy images"
-version: "0.1.0"
+version: "0.2.0"
 date-released: "2026-05-09"
 authors:
   - family-names: "Sahin"
     given-names: "Utku"
 license: "BSD-3-Clause"
 repository-code: "https://github.com/utkuvibing/PoroScope"
-

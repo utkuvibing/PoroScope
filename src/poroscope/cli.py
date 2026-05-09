@@ -8,6 +8,7 @@ from typing import Annotated, Optional
 import typer
 
 from .config import AnalysisConfig, Crop
+from .batch import run_batch
 from .pipeline import analyze_image
 
 app = typer.Typer(help="Calibrated porosity analysis for microscopy images.")
@@ -60,6 +61,44 @@ def analyze(
     typer.echo(f"Pores detected: {result.summary['pore_count']}")
     if result.output_paths:
         typer.echo(f"Results: {Path(result.output_paths['summary']).parent}")
+
+
+@app.command()
+def batch(
+    image_dir: Annotated[Path, typer.Argument(help="Directory containing PNG, JPG/JPEG, or TIFF images.")],
+    pixel_size: Annotated[float, typer.Option("--pixel-size", help="Physical length per pixel.")] = 1.0,
+    unit: Annotated[str, typer.Option("--unit", help="Physical length unit, for example um.")] = "px",
+    pores: Annotated[str, typer.Option("--pores", help="'dark' for below-threshold pores, 'bright' for above-threshold pores.")] = "dark",
+    threshold: Annotated[str, typer.Option("--threshold", help="'otsu' or 'manual'.")] = "otsu",
+    threshold_value: Annotated[float | None, typer.Option("--threshold-value", help="Manual threshold in 0-255 intensity units; images are normalized to 0-255 before thresholding.")] = None,
+    min_size: Annotated[int, typer.Option("--min-size", help="Remove pore objects smaller than this pixel area.")] = 20,
+    fill_holes: Annotated[bool, typer.Option("--fill-holes", help="Fill internal holes in pore objects.")] = False,
+    crop: Annotated[Optional[tuple[int, int, int, int]], typer.Option("--crop", help="Crop as x y width height.")] = None,
+    output: Annotated[Path, typer.Option("--output", "-o", help="Output directory.")] = Path("results"),
+    overwrite: Annotated[bool, typer.Option("--overwrite", help="Replace existing per-image result directories.")] = False,
+) -> None:
+    """Analyze all supported images in a directory and write aggregate summaries."""
+
+    try:
+        config = AnalysisConfig(
+            pixel_size=pixel_size,
+            unit=unit,
+            pores=pores,  # type: ignore[arg-type]
+            threshold=threshold,  # type: ignore[arg-type]
+            threshold_value=threshold_value,
+            min_size=min_size,
+            fill_holes=fill_holes,
+            crop=_parse_crop(crop),
+        )
+        result = run_batch(image_dir, config=config, output_dir=output, overwrite=overwrite)
+    except Exception as exc:
+        raise typer.BadParameter(str(exc)) from exc
+
+    typer.echo(f"Processed images: {len(result.processed)}")
+    typer.echo(f"Failed images: {len(result.failed_files)}")
+    typer.echo(f"Skipped unsupported files: {len(result.skipped_files)}")
+    typer.echo(f"Batch CSV: {result.output_paths['batch_summary_csv']}")
+    typer.echo(f"Batch JSON: {result.output_paths['batch_summary_json']}")
 
 
 if __name__ == "__main__":

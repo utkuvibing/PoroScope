@@ -6,7 +6,7 @@
 
 PoroScope is an open-source Python toolkit for calibrated porosity analysis in microscopy and SEM microstructure images.
 
-The v0.1 scope is deliberately narrow: one reliable single-image workflow from image loading to pore segmentation, calibrated measurements, and reproducible exports.
+The current scope is deliberately narrow: reliable single-image and folder-level workflows from image loading to pore segmentation, calibrated measurements, and reproducible exports.
 
 ```text
 image -> grayscale -> threshold -> pore mask -> cleanup -> measurements -> exports
@@ -26,6 +26,7 @@ Included:
 - Porosity percentage and per-pore measurement table.
 - Mask, overlay, CSV, summary JSON, and config JSON export.
 - Single-image CLI.
+- Batch CLI with aggregate CSV/JSON summaries.
 - Unit tests with synthetic images.
 
 Not included in v0.1:
@@ -33,7 +34,6 @@ Not included in v0.1:
 - napari plugin.
 - Streamlit dashboard.
 - HTML/PDF reports.
-- Batch processing.
 - Saved calibration profiles.
 - Adaptive thresholding or CLAHE.
 - Multiphase segmentation.
@@ -87,6 +87,22 @@ Analyze an image with Otsu thresholding:
 ```bash
 poroscope analyze image.tif --pixel-size 0.5 --unit um --pores dark --output results/
 ```
+
+Batch-analyze all supported images in a folder:
+
+```bash
+poroscope batch images/ \
+  --pixel-size 0.5 \
+  --unit um \
+  --pores dark \
+  --threshold otsu \
+  --min-size 20 \
+  --fill-holes \
+  --output results/ \
+  --overwrite
+```
+
+Batch mode processes PNG, JPG/JPEG, and TIFF files directly inside the input folder. Unsupported files are skipped. Images that fail during analysis are recorded in `batch_summary.json`, and processing continues for the remaining images.
 
 Analyze bright pores with a manual threshold:
 
@@ -157,6 +173,24 @@ results/
 ```
 
 The CSV contains one row per detected pore. If no pores are detected, PoroScope writes a valid CSV with headers and zero rows.
+
+Batch mode also writes aggregate files in the selected output directory:
+
+```text
+results/
+├── batch_summary.csv
+├── batch_summary.json
+├── image_a/
+│   ├── image_a_mask.tif
+│   ├── image_a_overlay.png
+│   ├── image_a_measurements.csv
+│   ├── image_a_summary.json
+│   └── image_a_config.json
+└── image_b/
+    └── ...
+```
+
+The aggregate CSV includes per-image porosity, pore count, pixel counts, pore area statistics, and output folder paths.
 
 ## Important Input Guidance
 
