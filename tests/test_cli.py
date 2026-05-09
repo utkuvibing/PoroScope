@@ -83,3 +83,36 @@ def test_cli_accepts_crop(tmp_path):
     )
 
     assert result.exit_code == 0, result.output
+
+
+def test_cli_refuses_existing_result_directory_by_default(tmp_path):
+    image = np.full((20, 20), 220, dtype=np.uint8)
+    image[5:10, 5:10] = 20
+    image_path = tmp_path / "sample.tif"
+    tifffile.imwrite(image_path, image)
+    output = tmp_path / "results"
+
+    first = runner.invoke(app, ["analyze", str(image_path), "--output", str(output), "--min-size", "1"])
+    second = runner.invoke(app, ["analyze", str(image_path), "--output", str(output), "--min-size", "1"])
+
+    assert first.exit_code == 0, first.output
+    assert second.exit_code != 0
+    assert "overwrite" in second.output
+
+
+def test_cli_overwrite_allows_existing_result_directory(tmp_path):
+    image = np.full((20, 20), 220, dtype=np.uint8)
+    image[5:10, 5:10] = 20
+    image_path = tmp_path / "sample.tif"
+    tifffile.imwrite(image_path, image)
+    output = tmp_path / "results"
+
+    first = runner.invoke(app, ["analyze", str(image_path), "--output", str(output), "--min-size", "1"])
+    second = runner.invoke(
+        app,
+        ["analyze", str(image_path), "--output", str(output), "--min-size", "1", "--overwrite"],
+    )
+
+    assert first.exit_code == 0, first.output
+    assert second.exit_code == 0, second.output
+    assert (output / "sample" / "sample_summary.json").exists()

@@ -31,11 +31,12 @@ def analyze(
     unit: Annotated[str, typer.Option("--unit", help="Physical length unit, for example um.")] = "px",
     pores: Annotated[str, typer.Option("--pores", help="'dark' for below-threshold pores, 'bright' for above-threshold pores.")] = "dark",
     threshold: Annotated[str, typer.Option("--threshold", help="'otsu' or 'manual'.")] = "otsu",
-    threshold_value: Annotated[float | None, typer.Option("--threshold-value", help="Manual threshold in 0-255 intensity units.")] = None,
+    threshold_value: Annotated[float | None, typer.Option("--threshold-value", help="Manual threshold in 0-255 intensity units; images are normalized to 0-255 before thresholding.")] = None,
     min_size: Annotated[int, typer.Option("--min-size", help="Remove pore objects smaller than this pixel area.")] = 20,
     fill_holes: Annotated[bool, typer.Option("--fill-holes", help="Fill internal holes in pore objects.")] = False,
     crop: Annotated[Optional[tuple[int, int, int, int]], typer.Option("--crop", help="Crop as x y width height.")] = None,
     output: Annotated[Path, typer.Option("--output", "-o", help="Output directory.")] = Path("results"),
+    overwrite: Annotated[bool, typer.Option("--overwrite", help="Replace an existing result directory for this image.")] = False,
 ) -> None:
     """Analyze one image and export mask, overlay, CSV, summary JSON, and config JSON."""
 
@@ -50,7 +51,7 @@ def analyze(
             fill_holes=fill_holes,
             crop=_parse_crop(crop),
         )
-        result = analyze_image(image_path, config=config, output_dir=output)
+        result = analyze_image(image_path, config=config, output_dir=output, overwrite=overwrite)
     except Exception as exc:
         raise typer.BadParameter(str(exc)) from exc
 

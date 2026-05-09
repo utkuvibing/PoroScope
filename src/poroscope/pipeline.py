@@ -34,6 +34,7 @@ def analyze_image(
     image_path: str | Path,
     config: AnalysisConfig,
     output_dir: str | Path | None = None,
+    overwrite: bool = False,
 ) -> AnalysisResult:
     """Run the complete v0.1 pipeline for one image."""
 
@@ -82,6 +83,7 @@ def analyze_image(
             measurements=measurements,
             summary=summary,
             config=config,
+            overwrite=overwrite,
         )
         summary["output_paths"] = output_paths
         write_json(output_paths["summary"], summary)
@@ -106,11 +108,17 @@ def export_analysis(
     measurements: pd.DataFrame,
     summary: dict[str, Any],
     config: AnalysisConfig,
+    overwrite: bool = False,
 ) -> dict[str, str]:
     """Write all v0.1 output files and return their paths."""
 
     stem = image_path.stem
     result_dir = output_dir / stem
+    if result_dir.exists() and not overwrite:
+        raise FileExistsError(
+            f"Result directory already exists: {result_dir}. "
+            "Use --overwrite to replace existing result files."
+        )
     result_dir.mkdir(parents=True, exist_ok=True)
 
     paths = {
@@ -126,4 +134,3 @@ def export_analysis(
     write_measurements(paths["measurements"], measurements)
     write_json(paths["config"], config.to_dict())
     return paths
-

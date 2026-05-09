@@ -54,6 +54,15 @@ class AnalysisConfig:
             raise ValueError("threshold must be 'otsu' or 'manual'.")
         if self.threshold == "manual" and self.threshold_value is None:
             raise ValueError("threshold_value is required when threshold='manual'.")
+        if (
+            self.threshold == "manual"
+            and self.threshold_value is not None
+            and not 0.0 <= self.threshold_value <= 255.0
+        ):
+            raise ValueError(
+                "threshold_value must be between 0 and 255 because images are "
+                "normalized to 0-255 before thresholding."
+            )
         if self.threshold == "otsu" and self.threshold_value is not None:
             raise ValueError("threshold_value is only valid when threshold='manual'.")
         if self.min_size < 0:
@@ -63,4 +72,3 @@ class AnalysisConfig:
         data = asdict(self)
         data["crop"] = self.crop.to_dict() if self.crop else None
         return data
-

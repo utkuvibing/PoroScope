@@ -64,6 +64,8 @@ poroscope analyze image.tif \
   --output results/
 ```
 
+Manual threshold values are expressed in the internal 0-255 intensity range. PoroScope converts input images to grayscale and normalizes intensities to 0-255 before thresholding, regardless of the original image dtype.
+
 Crop away scale bars, labels, or SEM metadata before analysis:
 
 ```bash
@@ -76,6 +78,12 @@ poroscope analyze image.tif \
 ```
 
 Crop format is `x y width height`, in pixels. The crop is applied before thresholding and all reported measurements refer to the cropped analysis region.
+
+By default, PoroScope refuses to write into an existing result folder such as `results/image/`. Use `--overwrite` only when you intentionally want to replace the existing output files:
+
+```bash
+poroscope analyze image.tif --pixel-size 0.5 --unit um --pores dark --output results/ --overwrite
+```
 
 ## Calibration
 
@@ -95,6 +103,8 @@ Pores can appear dark or bright depending on imaging mode and preprocessing.
 
 - `--pores dark`: pixels below the threshold are pores.
 - `--pores bright`: pixels above the threshold are pores.
+
+For manual thresholding, the threshold is applied after grayscale conversion and 0-255 normalization.
 
 ## Output Files
 
@@ -134,4 +144,3 @@ If you use PoroScope in academic work, please cite the archived release once ava
 ## License
 
 PoroScope is released under the BSD-3-Clause license.
-
