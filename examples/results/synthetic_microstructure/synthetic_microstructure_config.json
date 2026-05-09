@@ -1,0 +1,10 @@
+{
+  "pixel_size": 0.5,
+  "unit": "um",
+  "pores": "dark",
+  "threshold": "otsu",
+  "threshold_value": null,
+  "min_size": 20,
+  "fill_holes": true,
+  "crop": null
+}

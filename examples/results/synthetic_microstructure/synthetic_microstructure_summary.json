@@ -1,0 +1,29 @@
+{
+  "image_width_px": 256,
+  "image_height_px": 256,
+  "analyzed_pixel_count": 65536,
+  "pore_pixel_count": 6183,
+  "porosity_percent": 9.43450927734375,
+  "pore_count": 18,
+  "pixel_size": 0.5,
+  "unit": "um",
+  "threshold_method": "otsu",
+  "threshold_value": 112.724609375,
+  "pores": "dark",
+  "min_size": 20,
+  "fill_holes": true,
+  "mean_pore_area_unit2": 85.875,
+  "median_pore_area_unit2": 22.25,
+  "min_pore_area_unit2": 6.0,
+  "max_pore_area_unit2": 357.75,
+  "input_path": "examples\\data\\synthetic_microstructure.tif",
+  "crop": null,
+  "poroscope_version": "0.1.0",
+  "output_paths": {
+    "mask": "examples\\results\\synthetic_microstructure\\synthetic_microstructure_mask.tif",
+    "overlay": "examples\\results\\synthetic_microstructure\\synthetic_microstructure_overlay.png",
+    "measurements": "examples\\results\\synthetic_microstructure\\synthetic_microstructure_measurements.csv",
+    "summary": "examples\\results\\synthetic_microstructure\\synthetic_microstructure_summary.json",
+    "config": "examples\\results\\synthetic_microstructure\\synthetic_microstructure_config.json"
+  }
+}

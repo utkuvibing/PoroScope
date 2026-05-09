@@ -11,5 +11,6 @@ venv/
 build/
 dist/
 results/
+!examples/results/
+!examples/results/**
 tmp_smoke/
-

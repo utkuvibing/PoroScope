@@ -1,5 +1,9 @@
 # PoroScope
 
+[![tests](https://github.com/utkuvibing/PoroScope/actions/workflows/tests.yml/badge.svg)](https://github.com/utkuvibing/PoroScope/actions/workflows/tests.yml)
+![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+[![License](https://img.shields.io/badge/license-BSD--3--Clause-green)](LICENSE)
+
 PoroScope is an open-source Python toolkit for calibrated porosity analysis in microscopy and SEM microstructure images.
 
 The v0.1 scope is deliberately narrow: one reliable single-image workflow from image loading to pore segmentation, calibrated measurements, and reproducible exports.
@@ -35,6 +39,38 @@ Not included in v0.1:
 - Multiphase segmentation.
 - Deep learning.
 - Full ImageJ/Fiji validation.
+
+## Example Output
+
+The example below is fully synthetic and generated from `examples/generate_synthetic_example.py`. It is intended as a lightweight visual smoke test for the README, not as a validation dataset.
+
+| Synthetic input | Binary pore mask | Detected pore overlay |
+| --- | --- | --- |
+| ![Synthetic microstructure](examples/data/synthetic_microstructure.png) | ![Detected pore mask](examples/results/synthetic_microstructure/synthetic_microstructure_mask.png) | ![Detected pore overlay](examples/results/synthetic_microstructure/synthetic_microstructure_overlay.png) |
+
+For this synthetic image, PoroScope detects dark pore-like regions in a bright matrix and exports the mask, overlay, per-pore table, summary JSON, and reproducibility config.
+
+Summary excerpt:
+
+```json
+{
+  "porosity_percent": 9.4345,
+  "pore_count": 18,
+  "pixel_size": 0.5,
+  "unit": "um",
+  "threshold_method": "otsu",
+  "pores": "dark"
+}
+```
+
+Measurement CSV excerpt:
+
+```text
+label,area_px,area_unit2,equivalent_diameter_px,equivalent_diameter_unit,touches_border
+1,367.0,91.75,21.62,10.81,False
+2,24.0,6.0,5.53,2.76,False
+3,859.0,214.75,33.07,16.54,False
+```
 
 ## Installation
 
@@ -136,6 +172,12 @@ PoroScope v0.1 performs binary 2D porosity analysis only. Results depend on imag
 - v0.3: napari plugin and interactive threshold preview.
 - v0.4: HTML reports, saved calibration profiles, validation datasets.
 - v1.0: stable API, documentation site, archived DOI release, publication-ready validation.
+
+Suggested GitHub topics:
+
+```text
+materials-science image-analysis porosity microscopy sem scientific-python scikit-image materials-characterization
+```
 
 ## Citation
 
