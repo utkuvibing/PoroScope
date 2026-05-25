@@ -91,6 +91,9 @@ def batch(
     crop: Annotated[Optional[tuple[int, int, int, int]], typer.Option("--crop", help="Crop as x y width height.")] = None,
     output: Annotated[Path, typer.Option("--output", "-o", help="Output directory.")] = Path("results"),
     overwrite: Annotated[bool, typer.Option("--overwrite", help="Replace existing per-image result directories.")] = False,
+    parallel: Annotated[bool, typer.Option("--parallel/--sequential", help="Use parallel processing.")] = True,
+    max_workers: Annotated[int | None, typer.Option("--max-workers", help="Max parallel workers.")] = None,
+    html_report: Annotated[bool, typer.Option("--html/--no-html", help="Generate HTML report.")] = True,
 ) -> None:
     """Batch-analyze all supported images in a directory for porosity."""
     try:
@@ -104,7 +107,11 @@ def batch(
             fill_holes=fill_holes,
             crop=_parse_crop(crop),
         )
-        result = run_batch(image_dir, config=config, output_dir=output, overwrite=overwrite)
+        result = run_batch(
+            image_dir, config=config, output_dir=output,
+            overwrite=overwrite, parallel=parallel,
+            max_workers=max_workers, html_report=html_report,
+        )
     except Exception as exc:
         raise typer.BadParameter(str(exc)) from exc
 
@@ -113,6 +120,8 @@ def batch(
     typer.echo(f"Skipped unsupported files: {len(result.skipped_files)}")
     typer.echo(f"Batch CSV: {result.output_paths['batch_summary_csv']}")
     typer.echo(f"Batch JSON: {result.output_paths['batch_summary_json']}")
+    if result.output_paths.get("batch_report_html"):
+        typer.echo(f"HTML Report: {result.output_paths['batch_report_html']}")
 
 
 @app.command()

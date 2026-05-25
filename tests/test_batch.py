@@ -8,6 +8,7 @@ from skimage import io as skio
 
 from poroscope.batch import find_supported_images, run_batch
 from poroscope.config import AnalysisConfig
+from poroscope.report import generate_html_report
 
 
 def _write_synthetic_tif(path, pore_slice=(slice(5, 10), slice(5, 10))):
@@ -29,6 +30,8 @@ def test_batch_detects_supported_images_and_skips_unsupported_files(tmp_path):
         tmp_path,
         config=AnalysisConfig(pixel_size=0.5, unit="um", pores="dark", min_size=1),
         output_dir=tmp_path / "results",
+        parallel=False,
+        html_report=False,
     )
 
     assert [path.name for path in supported] == ["a.tif", "b.tiff", "c.png", "d.jpg"]
@@ -45,6 +48,8 @@ def test_batch_creates_per_image_outputs_and_aggregate_files(tmp_path):
         tmp_path,
         config=AnalysisConfig(pixel_size=0.5, unit="um", pores="dark", min_size=1),
         output_dir=output,
+        parallel=False,
+        html_report=False,
     )
 
     assert len(result.processed) == 2
@@ -90,6 +95,8 @@ def test_batch_records_failed_supported_images_and_continues(tmp_path):
         tmp_path,
         config=AnalysisConfig(pixel_size=0.5, unit="um", pores="dark", min_size=1),
         output_dir=output,
+        parallel=False,
+        html_report=False,
     )
 
     assert len(result.processed) == 1
@@ -106,9 +113,9 @@ def test_batch_overwrite_behavior(tmp_path):
     output = tmp_path / "results"
     config = AnalysisConfig(pixel_size=0.5, unit="um", pores="dark", min_size=1)
 
-    first = run_batch(tmp_path, config=config, output_dir=output)
-    second = run_batch(tmp_path, config=config, output_dir=output)
-    third = run_batch(tmp_path, config=config, output_dir=output, overwrite=True)
+    first = run_batch(tmp_path, config=config, output_dir=output, parallel=False, html_report=False)
+    second = run_batch(tmp_path, config=config, output_dir=output, parallel=False, html_report=False)
+    third = run_batch(tmp_path, config=config, output_dir=output, overwrite=True, parallel=False, html_report=False)
 
     assert len(first.processed) == 1
     assert len(second.processed) == 0
@@ -123,4 +130,23 @@ def test_batch_rejects_non_directory(tmp_path):
     _write_synthetic_tif(image_path)
     with pytest.raises(NotADirectoryError):
         find_supported_images(image_path)
+
+
+def test_generate_html_report(tmp_path):
+    """HTML report is generated from batch summary JSON."""
+    _write_synthetic_tif(tmp_path / "a.tif")
+    result = run_batch(
+        tmp_path,
+        config=AnalysisConfig(pixel_size=0.5, unit="um", pores="dark", min_size=1),
+        output_dir=tmp_path / "results",
+        parallel=False,
+        html_report=True,
+    )
+
+    html_path = tmp_path / "results" / "batch_report.html"
+    assert html_path.exists()
+    html = html_path.read_text()
+    assert "PoroScope Batch Report" in html
+    assert "a.tif" in html
+    assert "Processed" in html
 
