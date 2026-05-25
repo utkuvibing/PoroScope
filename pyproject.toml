@@ -38,9 +38,15 @@ test = [
   "pytest>=7.4",
   "pytest-cov>=4.1",
 ]
+napari = [
+  "napari>=0.5",
+]
 
 [project.scripts]
 poroscope = "poroscope.cli:app"
+
+[project.entry-points."napari.manifest"]
+poroscope = "poroscope:napari.yaml"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -1,0 +1,15 @@
+name: poroscope
+display_name: PoroScope
+version: 0.2.0
+description: Calibrated microstructure analysis for microscopy and SEM images
+license: BSD-3-Clause
+
+contributions:
+  commands:
+    - id: poroscope.dock_widget
+      title: Open PoroScope
+      python_name: poroscope.napari_plugin:poroscope_plugin
+
+  widgets:
+    - command: poroscope.dock_widget
+      display_name: PoroScope
