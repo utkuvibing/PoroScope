@@ -5,14 +5,15 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "poroscope"
 version = "0.2.0"
-description = "Calibrated porosity analysis for microscopy and SEM microstructure images."
+description = "Calibrated microstructure analysis for microscopy and SEM images: porosity, grain size, phase fraction, particle analysis."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "BSD-3-Clause" }
 authors = [
-  { name = "Utku Sahin" }
+  { name = "Utku Sahin" },
 ]
-keywords = ["materials-science", "image-analysis", "porosity", "microscopy", "sem"]
+keywords = ["materials-science", "image-analysis", "porosity", "microscopy", "sem",
+            "grains", "particle-analysis", "microstructure"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Science/Research",
@@ -22,6 +23,7 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Topic :: Scientific/Engineering :: Image Processing",
+  "Topic :: Scientific/Engineering :: Physics",
 ]
 dependencies = [
   "numpy>=1.24",
@@ -41,6 +43,12 @@ test = [
 napari = [
   "napari>=0.5",
 ]
+
+[project.urls]
+Homepage = "https://github.com/utkuvibing/PoroScope"
+Documentation = "https://utkuvibing.github.io/PoroScope"
+Source = "https://github.com/utkuvibing/PoroScope"
+Issues = "https://github.com/utkuvibing/PoroScope/issues"
 
 [project.scripts]
 poroscope = "poroscope.cli:app"
