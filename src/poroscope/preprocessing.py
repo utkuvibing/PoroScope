@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import numpy as np
+from skimage import exposure
 from skimage.color import rgb2gray
 
 from .config import Crop
@@ -56,4 +57,60 @@ def apply_crop(image: np.ndarray, crop: Crop | None) -> np.ndarray:
         return image
     crop.validate(image.shape[:2])
     return image[crop.y : crop.y + crop.height, crop.x : crop.x + crop.width]
+
+
+def apply_clahe(
+    image: np.ndarray,
+    kernel_size: tuple[int, int] | None = None,
+    clip_limit: float = 0.01,
+    nbins: int = 256,
+) -> np.ndarray:
+    """Apply Contrast Limited Adaptive Histogram Equalization (CLAHE).
+
+    Improves local contrast and is especially useful for SEM images with
+    uneven illumination.
+
+    Parameters
+    ----------
+    image : np.ndarray
+        2D grayscale image.
+    kernel_size : tuple[int, int], optional
+        Size of the contextual region (kernel) in pixels.
+        Default is 1/8 of image dimensions.
+    clip_limit : float
+        Clipping limit, normalized between 0 and 1. Higher values
+        increase contrast. Default 0.01.
+    nbins : int
+        Number of histogram bins. Default 256.
+
+    Returns
+    -------
+    np.ndarray
+        CLAHE-enhanced image (float64, 0-255 range).
+    """
+    image = np.asarray(image)
+    if image.ndim != 2:
+        raise ValueError("CLAHE requires a 2D grayscale image.")
+
+    if kernel_size is None:
+        h, w = image.shape
+        kernel_size = (max(8, h // 8), max(8, w // 8))
+
+    # Normalize to [0, 1] for skimage equalization
+    img_norm = image.astype(np.float64)
+    img_min, img_max = img_norm.min(), img_norm.max()
+    if img_max > img_min:
+        img_norm = (img_norm - img_min) / (img_max - img_min)
+    else:
+        img_norm = np.zeros_like(img_norm)
+
+    enhanced = exposure.equalize_adapthist(
+        img_norm,
+        kernel_size=kernel_size,
+        clip_limit=clip_limit,
+        nbins=nbins,
+    )
+
+    # Scale back to 0-255
+    return enhanced * 255.0
 
