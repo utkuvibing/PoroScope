@@ -1,0 +1,81 @@
+site_name: PoroScope
+site_description: Calibrated microstructure analysis for microscopy and SEM images
+site_author: Utku Sahin
+repo_url: https://github.com/utkuvibing/PoroScope
+edit_uri: blob/main/docs/
+
+theme:
+  name: material
+  palette:
+    - scheme: slate
+      primary: indigo
+      accent: cyan
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    - scheme: default
+      primary: indigo
+      accent: cyan
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            show_source: true
+            show_root_heading: true
+            show_category_heading: true
+            merge_init_into_class: true
+            docstring_style: numpy
+
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - User Guide:
+    - Installation: guide/installation.md
+    - Porosity Analysis: guide/porosity.md
+    - Grain Size Analysis: guide/grains.md
+    - Phase Analysis: guide/phases.md
+    - Particle Analysis: guide/particles.md
+    - napari Plugin: guide/napari.md
+  - API Reference:
+    - Overview: api/overview.md
+    - Pipeline: api/pipeline.md
+    - Segmentation: api/segmentation.md
+    - Measurements: api/measurements.md
+    - Grains: api/grains.md
+    - Phases: api/phases.md
+    - Particles: api/particles.md
+  - Examples:
+    - SEM Porosity: examples/sem-porosity.md
+    - Grain Size: examples/grain-size.md
+    - Phase Analysis: examples/phase-analysis.md
+  - Contributing: contributing.md
+  - Changelog: changelog.md
